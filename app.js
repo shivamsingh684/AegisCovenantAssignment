@@ -1,25 +1,12 @@
-const express = require('express');
+
 const tesseract = require("tesseract.js")
-const app = express();
-const multer = require("multer");
 
-
-
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './uploads');
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname)
-    }
-})
-
-const upload = multer({ storage: storage })
-
-app.post("/upload", upload.single('profile'), (req, res) => {
-    // console.log(req.file)
+function controllers(req,res){
     try {
+        ///////////////for pan card//////////////////////
+        let data=req.query
+        let {type}=data
+        if(type==='panCard'){
         tesseract.recognize(
             'uploads/' + req.file.filename,
             'eng',
@@ -32,7 +19,7 @@ app.post("/upload", upload.single('profile'), (req, res) => {
             let d = dob[0].split('')
             return res.json({
                 message: {
-                    'idtype': 'panCard',
+                    'idtype': type,
                     "idNumber": allData[7].replace('*', '').trim(),
                     'info': {
                         "name": allData[2],
@@ -42,11 +29,49 @@ app.post("/upload", upload.single('profile'), (req, res) => {
                 }
             })
         })
+    }
+    //////////////////////////for Adhar///////////
+    if(type==='Adhar'){
+        tesseract.recognize(
+            'uploads/' + req.file.filename,
+            'eng',
+            { logger: m => console.log(m) }
+        ).then(({ data: { text } }) => {
+            
+             let allData = text.split("\n")
+             let str=''
+             for(let i=0;i<allData.length;i++){
+                var expr = /^([0-9]{4}[0-9]{4}[0-9]{4}$)|([0-9]{4}\s[0-9]{4}\s[0-9]{4}$)|([0-9]{4}-[0-9]{4}-[0-9]{4}$)/
+                let res=expr.test(allData[i])
+                if(res===true){
+                  str=allData[i]
+                }
+             }
+            
+            let gender=allData[5].split(' ')
+            let dob=allData[4].split(' ')
+            return res.json({
+                message: {
+                    
+                     'idtype': type,
+                     "idNumber": str,
+                     'info': {
+                        "name": allData[3].replace('¥','').trim(),
+                        'DOB':dob[4],
+                         "gender": gender[4].replace('/',''),
+                  
+                     }
+                }
+            })
+        })
+    }
+   
+   
     } catch (error) {
         console.error(error)
     }
-})
+}
 
-app.listen(3000, () => {
-    console.log("server up and running");
-})
+
+
+module.exports={controllers}
