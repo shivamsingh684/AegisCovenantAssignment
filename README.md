@@ -6,7 +6,8 @@ Dependencies used in this projects are :
 * multer
 * nodemon
 * tesseract.js
-* 
+
+
 Link for downloading postman collection
 
 https://drive.google.com/file/d/1yr2pMl3HggNMD7_eFMOQUD2BXFBbWFuU/view?usp=sharing
