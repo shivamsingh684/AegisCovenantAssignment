@@ -1,4 +1,7 @@
 # AegisCovenantAssignment
+
+# Indian ID OCR Script
+
 For running script use :  npx nodemon index.js / node index.js
 
 Dependencies used in this projects are :
